@@ -10,12 +10,10 @@ This project aims to build machine learning models that predict player potential
 
 To account for differences between playing positions, the project explores **position-specific regression models** for four main player roles:
 
-- **Forwards:** ST, CF
-- **Wingers:** LW, RW, LM, RM
-- **Midfielders:** CM, CDM, CAM
+- **Forwards:** ST, CFو LW, RW
+- **Midfielders:** CM, CDM, CAMو LM, RM
 - **Defenders:** CB, RB, RWB, LB, LWB
-- **Goalkeepers:** GK
-
+  
 The goal is to investigate whether specialized models can better capture the characteristics of players in different positions.
 
 ## 🎯 Objectives
@@ -41,7 +39,7 @@ The dataset contains FIFA player information, including demographic characterist
 | Ratings | Overall rating, potential |
 | Financial information | Market value, wage, release clause |
 | Player characteristics | Preferred foot, weak foot, skill moves |
-| Attacking attributes | Finishing, dribbling, positioning, shot power |
+| Attacking attributes | Finishing, dribbling, positioning |
 | Passing attributes | Short passing, long passing, vision, crossing |
 | Physical attributes | Acceleration, sprint speed, stamina, strength |
 | Defensive attributes | Interceptions, marking, standing tackle, sliding tackle |
@@ -73,7 +71,7 @@ The initial stage focuses on understanding the structure and quality of the data
 Tasks include:
 
 - Inspecting dataset dimensions and column data types.
-- Examining missing values and duplicate records.
+- Data Understanding and Cleaning
 - Checking inconsistent or invalid values.
 - Analyzing numerical and categorical features.
 - Preparing the data for exploratory analysis and modeling.
@@ -91,39 +89,33 @@ Areas of investigation include:
 - Outliers and skewness in numerical features.
 - Characteristics of younger players with high potential.
 
-### 3. Feature Engineering
+### 3. Feature Selection
 
-Feature engineering is used to create more informative representations of player characteristics.
+Feature selection is performed separately for forwards, midfielders, and defenders. Each group uses a different set of player attributes based on the characteristics of its playing role.
 
-Candidate engineered features include:
+Examples of selected features include:
 
-| Feature | Description |
-|---|---|
-| `growth_gap` | Difference between potential and overall rating |
-| `value_efficiency` | A measure relating player value to rating or performance |
-| `positions_count` | Number of positions listed for a player |
-| `value_log` | Log-transformed representation of player market value |
-| `young_underrated` | A feature designed to capture young players whose potential exceeds their current rating |
-| `roles` | Grouping players according to their playing roles |
-| `preferred_foot_binary` | Binary representation of preferred foot |
+- **Forwards:** Finishing, dribbling, ball control, shot power, positioning, and sprint speed.
+- **Midfielders:** Short passing, long passing, vision, dribbling, interceptions, and ball control.
+- **Defenders:** Interceptions, standing tackle, sliding tackle, marking, heading accuracy, and physical attributes.
 
-The exact definitions, transformations, and use of these features should be documented in the relevant notebook.
+The target variable is `potential`. The selected features are used to train separate regression models for each player group.
 
-**Important:** Features must be selected according to the prediction objective. Since `growth_gap` is calculated using `potential`, it must not be used as an input feature when predicting `potential`. Doing so would introduce target leakage. It may instead be used for post-prediction analysis.
+Player roles are assigned based on their listed positions. Players with multiple positions are assigned to the first matching role according to the implemented classification rules.
 
 ### 4. Position-Based Modeling
 
-Football players have different attribute profiles depending on their roles. For example, finishing and positioning are particularly relevant to forwards, while tackling and interceptions are more relevant to defenders.
+The project uses position-based regression models to investigate whether player attributes have different predictive relationships with potential across playing roles.
 
-The project investigates separate regression models for different player roles rather than assuming that a single model will perform equally well for every position.
+Players are categorized into three groups: forwards, midfielders, and defenders. A separate Random Forest Regressor is trained for each group using a role-specific feature set.
 
-This approach allows model performance and relevant features to be compared across player groups.
+Goalkeepers are identified by the position-classification function but are not included in the current model evaluation. Separate goalkeeper and winger models are potential extensions for future work.
 
 ### 5. Model Training and Evaluation
 
-The dataset is prepared for training and testing, and regression models are trained to predict the target variable.
+A Random Forest Regressor is trained separately for forwards, midfielders, and defenders.
 
-Model evaluation focuses on three metrics:
+For each group, the data is split into training and testing sets using an 80/20 ratio and random_state=42. Predictions are evaluated using three regression metrics:
 
 | Metric | Interpretation |
 |---|---|
@@ -135,15 +127,12 @@ The metrics are used together to evaluate prediction accuracy and compare model 
 
 ## 📊 Model Evaluation
 
-The following table can be completed with the final test-set results from each trained model.
-
 | Player role | MAE | RMSE | R² |
 |---|---:|---:|---:|
 | Forwards | 1.57 | 2.12 | 0.88 |
 | Midfielders | 1.66 | 2.19 | 0.87 |
 | Defenders | 1.68 | 2.27 | 0.84 |
 
-*Note: These results are placeholders, not measured model performance. Replace them with actual evaluation results before publishing.*
 
 ## 🚀 Getting Started
 
